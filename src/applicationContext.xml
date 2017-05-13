@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:aop="http://www.springframework.org/schema/aop"		
+	xmlns:context="http://www.springframework.org/schema/context"		
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+	
+	http://www.springframework.org/schema/tx 
+	http://www.springframework.org/schema/tx/spring-tx-3.1.xsd
+	
+	http://www.springframework.org/schema/context 
+	http://www.springframework.org/schema/context/spring-context-3.1.xsd
+	
+	http://www.springframework.org/schema/aop 
+	http://www.springframework.org/schema/aop/spring-aop-3.1.xsd
+	">
+
+	<context:annotation-config />
+	<context:component-scan base-package="com.dao"></context:component-scan>
+	<context:component-scan base-package="com.services"></context:component-scan>
+	
+	<bean id="dataSource"
+		class="org.apache.commons.dbcp.BasicDataSource">
+		<property name="url"
+			value="jdbc:sqlserver://localhost:1433;DatabaseName=school">
+		</property>
+		<property name="driverClassName"> 
+        	<value>com.microsoft.sqlserver.jdbc.SQLServerDriver</value> 
+        </property> 
+		<property name="username" value="sa"></property>
+		<property name="password" value="sa"></property>
+	</bean>
+	<bean id="sessionFactory"
+		class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
+		<property name="dataSource">
+			<ref bean="dataSource" />
+		</property>
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">
+					org.hibernate.dialect.SQLServerDialect
+				</prop>
+				<prop key="hibernate.show_sql">
+					true
+				</prop>
+				<prop key="hibernate.format_sql">
+					true
+				</prop>
+			</props>
+		</property>
+		<property name="annotatedClasses">
+			<list>
+				<value>com.bean.Grade</value>
+				<value>com.bean.ClassCourse</value>
+				<value>com.bean.UserRole</value>
+				<value>com.bean.Users</value>
+				<value>com.bean.Msg</value>
+				<value>com.bean.Role</value>
+				<value>com.bean.UserClass</value>
+				<value>com.bean.Class</value>
+				<value>com.bean.Score</value>
+				<value>com.bean.Course</value></list>
+		</property></bean>
+		
+		<!-- 代理事务管理器-->
+		<bean id="transactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+			<property name="sessionFactory" ref="sessionFactory"></property>
+		</bean>
+		<!-- 注入事务的传播属性，指定哪些方法需要使用事务 -->
+		<tx:advice id="txavd" transaction-manager="transactionManager">
+			<tx:attributes>
+				<tx:method name="save*" propagation="REQUIRED"/>
+				<tx:method name="update*" propagation="REQUIRED"/>
+				<tx:method name="del*" propagation="REQUIRED"/>
+				<tx:method name="find*" propagation="NOT_SUPPORTED"/>
+				<tx:method name="*" propagation="REQUIRED" rollback-for="Exception" />
+			</tx:attributes>
+		</tx:advice>
+		
+		<!-- 注入事务的切入点，指定哪些包和子包中的类需要使用事务 -->
+		<aop:config>
+			<aop:pointcut expression="execution(* com.services.*.*(..))" id="bizpoint"/>
+			<aop:advisor advice-ref="txavd" pointcut-ref="bizpoint"/>
+		</aop:config>
+	</beans>
