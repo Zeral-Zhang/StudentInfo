@@ -2,3 +2,4 @@
 !/src
 !/WebRoot
 !.gitignore
+/WebRoot/WEB-INF/classes
