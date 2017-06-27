@@ -22,7 +22,8 @@
 	<context:component-scan base-package="com.services"></context:component-scan>
 	
 	<bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-		<property name="locations"  value="classpath*:jdbc.properties" ></property>
+		<!-- 请尽量使用classpath,在指定路径下寻找：classpath*: 会将同名文件合并 -->
+		<property name="locations"  value="classpath:jdbc.properties" ></property>
 		<property name="fileEncoding" value="utf-8"></property>
 	</bean>
 	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
