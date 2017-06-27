@@ -4,8 +4,7 @@
 	xmlns:aop="http://www.springframework.org/schema/aop"		
 	xmlns:context="http://www.springframework.org/schema/context"		
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-	xmlns:p="http://www.springframework.org/schema/p"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
 	http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
 	
 	http://www.springframework.org/schema/tx 
@@ -22,16 +21,36 @@
 	<context:component-scan base-package="com.dao"></context:component-scan>
 	<context:component-scan base-package="com.services"></context:component-scan>
 	
-	<bean id="dataSource"
-		class="org.apache.commons.dbcp.BasicDataSource">
-		<property name="url"
-			value="jdbc:sqlserver://localhost:1433;DatabaseName=school">
+	<bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations"  value="classpath*:jdbc.properties" ></property>
+		<property name="fileEncoding" value="utf-8"></property>
+	</bean>
+	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+		<!-- 指定连接数据库的JDBC驱动 -->
+		<property name="driverClass" value="${jdbc.driver}">
 		</property>
-		<property name="driverClassName"> 
-        	<value>com.microsoft.sqlserver.jdbc.SQLServerDriver</value> 
-        </property> 
-		<property name="username" value="sa"></property>
-		<property name="password" value="sa"></property>
+		<!-- 连接数据库所用的URL -->
+		<property name="jdbcUrl"
+				  value="${jdbc.url}">
+		</property>
+		<!-- 连接数据库的用户名 -->
+		<property name="user" value="${jdbc.username}">
+		</property>
+		<!-- 连接数据库的密码 -->
+		<property name="password" value="${jdbc.password}">
+		</property>
+		<!-- 设置数据库连接池的最大连接数 -->
+		<property name="maxPoolSize" value="20">
+		</property>
+		<!-- 设置数据库连接池的最小连接数 -->
+		<property name="minPoolSize" value="2">
+		</property>
+		<!-- 设置数据库连接池的初始化连接数 -->
+		<property name="initialPoolSize" value="2">
+		</property>
+		<!-- 设置数据库连接池的连接的最大空闲时间,单位为秒 -->
+		<property name="maxIdleTime" value="20">
+		</property>
 	</bean>
 	<bean id="sessionFactory"
 		class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
